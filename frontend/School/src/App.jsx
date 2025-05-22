@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import Navbar from './components/Navbar.jsx' 
 import Login from './pages/login.jsx'
 import Dashboard from './pages/dashboard.jsx'
 import Students from './pages/Students.jsx'
