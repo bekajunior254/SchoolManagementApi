@@ -1,32 +1,63 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Register from './pages/Register.jsx';
-import Navbar from './components/Navbar.jsx' 
-import Login from './pages/login.jsx'
-import Dashboard from './pages/dashboard.jsx'
-import Students from './pages/Students.jsx'
-import Teachers from './pages/teachers.jsx'
-import Courses from './pages/courses.jsx'
-import './App.css'
+import Login from './pages/login.jsx';
+import Dashboard from './pages/dashboard.jsx';
+import Students from './pages/students.jsx';
+import Teachers from './pages/Teachers.jsx';
+import Courses from './pages/courses.jsx';
+import Navbar from './components/Navbar.jsx';
+import PrivateRoute from './components/PrivateRoute.jsx';
+import './App.css';
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 p-4">
-        <h1 className="text-3xl font-bold text-blue-600 text-center mb-6">
-          Hello School Management System
-        </h1>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/students" element={<Students />} />
-          <Route path="/teachers" element={<Teachers />} />
-          <Route path="/courses" element={<Courses />} />
-        </Routes>
+      <div className="min-h-screen bg-gray-100">
+        <Navbar />
+        <div className="p-4">
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
+            {/* Protected Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/students"
+              element={
+                <PrivateRoute>
+                  <Students />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/teachers"
+              element={
+                <PrivateRoute>
+                  <Teachers />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/courses"
+              element={
+                <PrivateRoute>
+                  <Courses />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </div>
       </div>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;

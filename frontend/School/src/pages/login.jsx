@@ -14,7 +14,7 @@ export default function Login() {
     }
 
     // Mock login process
-    if (username === 'admin' && password === 'password') {
+    if (username === 'eli' && password === 'password254') {
       alert('Login successful! Redirecting...');
       setErrorMsg('');
       // Redirect to dashboard or set auth state here

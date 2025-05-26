@@ -1,30 +1,38 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+  const token = localStorage.getItem('token');
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role'); // Optional: if you store role
+    navigate('/login');
+  };
+
   return (
-    <nav className="bg-blue-600 text-white px-4 py-3 shadow-md">
-      <div className="flex justify-between items-center max-w-7xl mx-auto">
-        <h1 className="text-xl font-bold">School Management</h1>
-        <ul className="flex space-x-6">
-         <li>
-            <Link to="/register" className="hover:underline">Register</Link>
-         </li>
-          <li>
-             <Link to="/" className="hover:underline">Dashboard</Link>
-          </li>
-          <li>
-            <Link to="/students" className="hover:underline">Students</Link>
-          </li>
-          <li>
-            <Link to="/teachers" className="hover:underline">Teachers</Link>
-          </li>
-          <li>
-            <Link to="/courses" className="hover:underline">Courses</Link>
-          </li>
-          <li>
-            <Link to="/login" className="hover:underline">Login</Link>
-          </li>
-        </ul>
+    <nav className="flex justify-between items-center px-6 py-4 bg-white shadow-md mb-6">
+      <h1 className="text-xl font-bold text-blue-600">School Management</h1>
+      <div className="space-x-6 text-sm font-medium">
+        {token ? (
+          <>
+            <Link to="/dashboard" className="hover:text-blue-500">Dashboard</Link>
+            <Link to="/students" className="hover:text-blue-500">Students</Link>
+            <Link to="/teachers" className="hover:text-blue-500">Teachers</Link>
+            <Link to="/courses" className="hover:text-blue-500">Courses</Link>
+            <button
+              onClick={handleLogout}
+              className="text-red-500 hover:underline"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="hover:text-blue-500">Login</Link>
+            <Link to="/register" className="hover:text-blue-500">Register</Link>
+          </>
+        )}
       </div>
     </nav>
   );
