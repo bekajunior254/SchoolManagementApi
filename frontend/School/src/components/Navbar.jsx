@@ -6,8 +6,11 @@ const Navbar = () => {
       <div className="flex justify-between items-center max-w-7xl mx-auto">
         <h1 className="text-xl font-bold">School Management</h1>
         <ul className="flex space-x-6">
+         <li>
+            <Link to="/register" className="hover:underline">Register</Link>
+         </li>
           <li>
-            <Link to="/" className="hover:underline">Dashboard</Link>
+             <Link to="/" className="hover:underline">Dashboard</Link>
           </li>
           <li>
             <Link to="/students" className="hover:underline">Students</Link>
