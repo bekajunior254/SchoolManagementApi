@@ -3,20 +3,21 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 using System.Text;
+using SchoolManagementApi; // Import RoleSeeder
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// --- Configure EF Core with Identity ---
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// JWT Authentication
+// --- JWT Authentication Configuration ---
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 builder.Services.AddAuthentication(options =>
 {
@@ -37,12 +38,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Swagger Configuration with JWT support
+// --- Swagger Configuration with JWT support ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Auth API", Version = "v1" });
-    
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "School Management API", Version = "v1" });
+
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme",
@@ -51,7 +52,7 @@ builder.Services.AddSwaggerGen(c =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
-    
+
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -70,7 +71,14 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// --- Seed Roles ---
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await RoleSeeder.SeedRolesAsync(services); // This seeds Admin, Teacher, Student, Parent
+}
+
+// --- Middleware ---
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -78,22 +86,19 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// Add authentication and authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Weather Forecast Endpoint (from template)
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
+// --- Sample Protected Endpoint ---
 app.MapGet("/weatherforecast", () =>
 {
+    var summaries = new[]
+    {
+        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+    };
+
     var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
+        new WeatherForecast(
             DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
             Random.Shared.Next(-20, 55),
             summaries[Random.Shared.Next(summaries.Length)]
@@ -102,17 +107,17 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast")
-.RequireAuthorization(); // Now requires authentication
+.RequireAuthorization(); // 🔐 Protected by token
 
-// Auth Endpoints
+// --- Auth Endpoints ---
 app.MapPost("/register", async (RegisterModel model, UserManager<IdentityUser> userManager) =>
 {
     var user = new IdentityUser { UserName = model.Email, Email = model.Email };
     var result = await userManager.CreateAsync(user, model.Password);
-    
+
     if (!result.Succeeded)
         return Results.BadRequest(result.Errors);
-    
+
     return Results.Ok(new { Message = "User created successfully!" });
 });
 
@@ -121,11 +126,12 @@ app.MapPost("/login", async (LoginModel model, UserManager<IdentityUser> userMan
     var user = await userManager.FindByEmailAsync(model.Email);
     if (user == null || !await userManager.CheckPasswordAsync(user, model.Password))
         return Results.Unauthorized();
-    
+
     var token = GenerateJwtToken(user, config);
     return Results.Ok(new { Token = token });
 });
 
+// --- JWT Token Generator ---
 string GenerateJwtToken(IdentityUser user, IConfiguration config)
 {
     var claims = new[]
@@ -137,13 +143,12 @@ string GenerateJwtToken(IdentityUser user, IConfiguration config)
 
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-    var expires = DateTime.Now.AddMinutes(Convert.ToDouble(config["Jwt:ExpireMinutes"]));
 
     var token = new JwtSecurityToken(
         issuer: config["Jwt:Issuer"],
         audience: config["Jwt:Audience"],
         claims: claims,
-        expires: expires,
+        expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(config["Jwt:DurationInMinutes"])),
         signingCredentials: creds
     );
 
@@ -152,7 +157,7 @@ string GenerateJwtToken(IdentityUser user, IConfiguration config)
 
 app.Run();
 
-// Models
+// --- Models ---
 record RegisterModel(string Email, string Password, string ConfirmPassword);
 record LoginModel(string Email, string Password);
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
@@ -160,7 +165,7 @@ record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
 
-// DbContext
+// --- EF DbContext ---
 class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
