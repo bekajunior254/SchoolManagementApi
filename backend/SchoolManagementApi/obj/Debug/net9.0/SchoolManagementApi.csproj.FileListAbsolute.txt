@@ -1,0 +1,8 @@
+C:\Users\user\Documents\SchoolManagement\SchoolManagementApi\backend\SchoolManagementApi\obj\Debug\net9.0\SchoolManagementApi.csproj.AssemblyReference.cache
+C:\Users\user\Documents\SchoolManagement\SchoolManagementApi\backend\SchoolManagementApi\obj\Debug\net9.0\SchoolManagementApi.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\user\Documents\SchoolManagement\SchoolManagementApi\backend\SchoolManagementApi\obj\Debug\net9.0\SchoolManagementApi.AssemblyInfoInputs.cache
+C:\Users\user\Documents\SchoolManagement\SchoolManagementApi\backend\SchoolManagementApi\obj\Debug\net9.0\SchoolManagementApi.AssemblyInfo.cs
+C:\Users\user\Documents\SchoolManagement\SchoolManagementApi\backend\SchoolManagementApi\obj\Debug\net9.0\SchoolManagementApi.csproj.CoreCompileInputs.cache
+C:\Users\user\Documents\SchoolManagement\SchoolManagementApi\backend\SchoolManagementApi\obj\Debug\net9.0\SchoolManagementApi.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\user\Documents\SchoolManagement\SchoolManagementApi\backend\SchoolManagementApi\obj\Debug\net9.0\SchoolManagementApi.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\user\Documents\SchoolManagement\SchoolManagementApi\backend\SchoolManagementApi\obj\Debug\net9.0\SchoolManagementApi.sourcelink.json
